@@ -2,10 +2,13 @@ from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import requests
 import os
+from flask_cors import CORS
 
 load_dotenv()
-
 app = Flask(__name__)
+CORS(app)
+
+
 
 @app.route("/chat/fetch", methods=["POST"])
 def fetch_gemini_api():
