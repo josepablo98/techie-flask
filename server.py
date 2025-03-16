@@ -24,8 +24,8 @@ def fetch_gemini_api():
         return jsonify({"ok": False, "message": "Falta el parámetro 'text'"}), 400
 
     text_prompting_engineering = f'''
-        Debes responder únicamente preguntas sobre teoría de programación, sea el lenguaje de programación que sea.  
-        Si la pregunta del usuario no está relacionada con este tema, responde de forma educada explicando que solo puedes ayudar con asuntos relacionados con la programación.  
+        Debes responder únicamente preguntas sobre teoría de programación, especificamente sobre python.  
+        Si la pregunta del usuario no está relacionada con este tema, o no está relacionada con Python, responde de forma educada explicando que solo puedes ayudar con asuntos relacionados con la programación sobre Python.  
 
         Tu respuesta debe sonar natural y bien estructurada, sin repetir frases innecesarias.  
         Si el usuario insiste en preguntar sobre otro tema, recuérdale amablemente que solo puedes responder sobre teoría de programación.
@@ -57,7 +57,7 @@ def fetch_gemini_api():
         {text_prompting_engineering}
         '''
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     try:
         payload = {
