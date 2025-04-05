@@ -24,7 +24,8 @@ def fetch_gemini_api():
     context = req_json.get("context", [])
 
     if not text:
-        return jsonify({"ok": False, "message": "Falta el parámetro 'text'"}), 400
+        message = "Falta el parámetro 'text'" if language == "es" else "Missing 'text' parameter"
+        return jsonify({"ok": False, "message": message}), 400
 
     text_prompting_engineering = generate_prompt(text, language, detailLevel, context)
 
@@ -48,9 +49,10 @@ def fetch_gemini_api():
         }), 200
 
     except Exception as error:
+        message = "Error en el servidor" if language == "es" else "Server error"
         return jsonify({
             "ok": False,
-            "message": "Error en el servidor",
+            "message": message,
             "error": str(error)
         }), 500
 
