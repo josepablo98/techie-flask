@@ -21,7 +21,6 @@ def generate_prompt(text, language, detailLevel, context=None):
             displayDetail = "Extenso"
             max_lines = 25
     else:
-        # Asumimos que 'en' es la otra opción principal
         if detail_lower == "simplified":
             displayDetail = "Simplified"
             max_lines = 5
@@ -51,14 +50,14 @@ FORMATO DE RESPUESTA:
 - Luego, el cuerpo de tu respuesta debe tener un máximo de {max_lines} líneas (según la configuración actual).
 
 === PREGUNTA DEL USUARIO ===
-"{text}"
+"{text.lstrip("Q$")}"
 """
 
-    # Agregamos contexto previo (sin alterar la configuración actual)
+    # Agregamos contexto previo si existe
     if context:
         formatted_context = "\n".join(
-            f"Usuario: {msg}" if i % 2 == 0 else f"Tú: {msg}"
-            for i, msg in [(item["index"], item["message"]) for item in context]
+            f"Usuario: {msg['message'][2:]}" if msg['message'].startswith("Q$") else f"Tú: {msg['message'][2:]}"
+            for msg in context
         )
         return f"""
 {base_prompt}

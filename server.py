@@ -30,7 +30,7 @@ def fetch_gemini_api():
     text_prompting_engineering = generate_prompt(text, language, detailLevel, context)
 
     print(text_prompting_engineering)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
     try:
         payload = {
@@ -38,11 +38,12 @@ def fetch_gemini_api():
                 "parts": [{"text": text_prompting_engineering}]
             }]
         }
+        
+        print(payload)
 
         headers = {"Content-Type": "application/json"}
         response = requests.post(url, json=payload, headers=headers)
         response_data = response.json()
-
         return jsonify({
             "ok": True,
             "response": response_data["candidates"][0]["content"]["parts"][0]["text"]
