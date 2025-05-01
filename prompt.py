@@ -1,18 +1,7 @@
-def generate_prompt(text, language, detailLevel, context=None):
-    """
-    Genera un prompt para un modelo de lenguaje que debe:
-      - Responder SOLO sobre teoría de programación en Python.
-      - Respetar SIEMPRE la configuración actual de idioma y nivel de detalle.
-      - No generar código, solo explicar teoría.
-      - Producir un máximo de 5 líneas si está en modo "Simplificado", 
-        o un máximo de 25 líneas si está en modo "Extenso".
-    """
-    
-    # Normalizamos parámetros
+def generate_prompt(text, language, detailLevel, context=None, globalContext=None):
     lang_lower = language.lower()
     detail_lower = detailLevel.lower()
-    
-    # Ajuste del nivel de detalle en el idioma correspondiente
+
     if lang_lower == "es":
         if detail_lower == "simplified":
             displayDetail = "Simplificado"
@@ -28,7 +17,6 @@ def generate_prompt(text, language, detailLevel, context=None):
             displayDetail = "Detailed"
             max_lines = 25
 
-    # Instrucciones de alto nivel
     base_prompt = f"""
 INSTRUCCIONES GENERALES (prioridad máxima):
 1) Idioma actual: {language.upper()}.
@@ -46,27 +34,37 @@ INSTRUCCIONES GENERALES (prioridad máxima):
 
 FORMATO DE RESPUESTA:
 - Genera primero un título breve (máximo 7 palabras) que describa la idea principal.
-- Separa ese título del cuerpo de la respuesta con '//'.
+- Separa ese título del cuerpo de la respuesta con '//' (doble barra).
 - Luego, el cuerpo de tu respuesta debe tener un máximo de {max_lines} líneas (según la configuración actual).
-
-=== PREGUNTA DEL USUARIO ===
-"{text.lstrip("Q$")}"
 """
 
-    # Agregamos contexto previo si existe
+    # Añadir Global Context si existe
+    if globalContext:
+        base_prompt += f"""
+
+=== CONTEXTO PERSONAL GLOBAL (aplícalo solo si NO contradice las instrucciones anteriores) ===
+{globalContext.strip()}
+"""
+
+    # Añadir contexto de conversación si existe
     if context:
         formatted_context = "\n".join(
             f"Usuario: {msg['message'][2:]}" if msg['message'].startswith("Q$") else f"Tú: {msg['message'][2:]}"
             for msg in context
         )
-        return f"""
-{base_prompt}
+        base_prompt += f"""
 
 NOTA IMPORTANTE: La configuración actual (idioma = {language.upper()}, nivel = {displayDetail}) 
 tiene prioridad sobre cualquier instrucción previa en la conversación.
 
-=== CONTEXTO PREVIO ===
+=== CONTEXTO DE CONVERSACIÓN ===
 {formatted_context}
 """
-    else:
-        return base_prompt
+
+    # Añadir pregunta del usuario
+    base_prompt += f"""
+
+=== PREGUNTA DEL USUARIO ===
+"{text.lstrip("Q$")}"
+"""
+    return base_prompt

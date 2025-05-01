@@ -22,14 +22,15 @@ def fetch_gemini_api():
     language = req_json.get("language")
     detailLevel = req_json.get("detailLevel")
     context = req_json.get("context", [])
+    globalContext = req_json.get("globalContext")
 
     if not text:
         message = "Falta el parámetro 'text'" if language == "es" else "Missing 'text' parameter"
         return jsonify({"ok": False, "message": message}), 400
 
-    text_prompting_engineering = generate_prompt(text, language, detailLevel, context)
+    text_prompting_engineering = generate_prompt(text, language, detailLevel, context, globalContext)
 
-    print(text_prompting_engineering)
+    print(globalContext)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
     try:
@@ -38,8 +39,6 @@ def fetch_gemini_api():
                 "parts": [{"text": text_prompting_engineering}]
             }]
         }
-        
-        print(payload)
 
         headers = {"Content-Type": "application/json"}
         response = requests.post(url, json=payload, headers=headers)
